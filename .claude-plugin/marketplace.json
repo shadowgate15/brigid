@@ -8,11 +8,17 @@
       "name": "brigid",
       "source": "./packages/claude-plugin",
       "description": "A GTD (Getting Things Done) personal assistant: capture and clarify your inbox, run weekly reviews, surface next actions by context, and plan your day. Adapts automatically to whichever task manager you have connected.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "repository": "https://github.com/shadowgate15/brigid",
       "license": "MIT",
       "category": "productivity",
-      "keywords": ["gtd", "productivity", "tasks", "todoist", "personal-assistant"]
+      "keywords": [
+        "gtd",
+        "productivity",
+        "tasks",
+        "todoist",
+        "personal-assistant"
+      ]
     }
   ]
 }
