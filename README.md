@@ -20,6 +20,17 @@ Currently supported: **Todoist** (task manager category). Calendar, notes, and e
 | `plan-day` | "plan my day", "help me engage with today" | Combines fixed commitments and next actions into a realistic daily plan (GTD's "engage" step) |
 | `gtd-connectors` | "what connectors are active", "is Todoist connected" | Reports which connector categories are currently detected, without changing anything |
 
+## Install
+
+This repo is also a Claude Code plugin marketplace. Add it and install:
+
+```
+/plugin marketplace add shadowgate15/brigid
+/plugin install brigid@brigid
+```
+
+Update later with `/plugin marketplace update brigid`. You can also download the packaged `brigid.plugin` from the [latest release](https://github.com/shadowgate15/brigid/releases).
+
 ## Setup
 
 No configuration required inside the plugin. To get task-manager features, connect Todoist in your environment's connector settings — the skills will detect it automatically. Without a connector, every skill still works conversationally.
