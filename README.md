@@ -53,10 +53,22 @@ pnpm exec nx release --first-release             # cut it for real
 pnpm exec nx release                             # subsequent releases
 ```
 
+Each release versions the changed projects, generates their changelog, commits, tags, creates a
+**GitHub Release** per tag, and publishes the npm packages.
+
 - **MCP packages** (`mcps` group) bump their `package.json`, generate a changelog, tag, and publish
-  to npm.
+  to npm (public — via each package's `publishConfig.access: public`).
 - **The plugin** (`plugin` group) is not an npm package. A custom version action
   ([`tools/nx/claude-plugin-version-actions.js`](tools/nx/claude-plugin-version-actions.js))
   propagates its version from `packages/claude-plugin/package.json` into
   `packages/claude-plugin/.claude-plugin/plugin.json` and the root `.claude-plugin/marketplace.json`
-  in the same release commit. It is `private`, so npm publish is skipped.
+  in the same release commit. It is `private`, so npm publish is a no-op — but it still gets a
+  GitHub Release for its tag.
+
+### Auth for local releases
+
+- **GitHub Releases** — Nx creates them via the GitHub API. It reads `GITHUB_TOKEN` / `GH_TOKEN`
+  if set, otherwise falls back to your authenticated [`gh` CLI](https://cli.github.com/)
+  (`gh auth token`). If you're logged in with `gh auth login`, no extra setup is needed.
+- **npm** — run `npm login` (or set an `NPM_TOKEN` in your npm config) before releasing so the
+  publish step is authenticated.

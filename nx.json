@@ -53,7 +53,9 @@
       "conventionalCommits": true
     },
     "changelog": {
-      "projectChangelogs": true,
+      "projectChangelogs": {
+        "createRelease": "github"
+      },
       "workspaceChangelog": false
     }
   },
