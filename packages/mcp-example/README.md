@@ -41,3 +41,5 @@ nx g @nx/js:lib packages/mcp-<name> --name=mcp-<name> --publishable \
 
 then adapt `package.json` (add `type: module`, `bin`, `publishConfig`), point the tsconfig at
 `nodenext`, and copy the `src/index.ts` + `src/bin.ts` pattern.
+
+🚀
