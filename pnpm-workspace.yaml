@@ -1,0 +1,6 @@
+packages:
+  - 'packages/*'
+
+onlyBuiltDependencies:
+  - nx
+  - '@nx/nx-darwin-arm64'

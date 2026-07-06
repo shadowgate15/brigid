@@ -1,46 +1,62 @@
 # brigid
 
-A GTD (Getting Things Done) personal assistant plugin for Claude. It runs the core GTD workflows — capturing and clarifying an inbox, weekly review, surfacing next actions, and daily planning — and adapts automatically to whichever tools you have connected, without the plugin bundling any tool integrations of its own.
+An [Nx](https://nx.dev) monorepo housing the **brigid** Claude Code plugin and a growing set of
+custom [Model Context Protocol](https://modelcontextprotocol.io) (MCP) servers.
 
-## How connectors work
+## Packages
 
-`brigid` doesn't ship an `.mcp.json` or any bundled MCP servers. Each skill checks, at runtime, which tools are already available in your environment (for example, a connected Todoist MCP) and only then loads the matching connector-specific instructions from its `references/` folder. If nothing matches, the skill falls back to a manual, conversational mode instead of erroring.
-
-This means "turning a connector on or off" is just connecting or disconnecting that tool wherever you normally manage integrations (e.g. Cowork's connector settings) — there's nothing to configure inside the plugin itself, and no unused tool schemas get loaded into context.
-
-Currently supported: **Todoist** (task manager category). Calendar, notes, and email categories are anticipated in the skill design but not yet implemented — adding one means adding a `references/<connector>.md` file to each relevant skill and updating the detection list in `gtd-connectors`.
-
-## Components
-
-| Skill | Trigger examples | Purpose |
+| Package | Path | Description |
 |---|---|---|
-| `process-inbox` | "process my inbox", "clarify my capture list" | GTD capture & clarify: turn raw notes/ideas into next actions, projects, waiting-for, someday/maybe, or reference |
-| `weekly-review` | "do my weekly review", "review my system" | Guided pass through the full GTD weekly review checklist |
-| `next-actions` | "what should I work on next", "show my @calls list" | Short, context-filtered list of next actions (not the whole backlog) |
-| `plan-day` | "plan my day", "help me engage with today" | Combines fixed commitments and next actions into a realistic daily plan (GTD's "engage" step) |
-| `gtd-connectors` | "what connectors are active", "is Todoist connected" | Reports which connector categories are currently detected, without changing anything |
+| `claude-plugin` | [`packages/claude-plugin`](packages/claude-plugin) | The brigid GTD personal-assistant plugin (skills + marketplace entry). |
+| `mcp-example` | [`packages/mcp-example`](packages/mcp-example) | Example MCP server and the template for new ones. |
 
-## Install
+The repo root is also a Claude Code plugin **marketplace** — `.claude-plugin/marketplace.json`
+points at `packages/claude-plugin`, so `/plugin marketplace add shadowgate15/brigid` still works
+unchanged. See the [plugin README](packages/claude-plugin/README.md) for install/usage.
 
-This repo is also a Claude Code plugin marketplace. Add it and install:
+## Getting started
 
+```sh
+pnpm install
+pnpm exec nx show projects      # list projects
+pnpm exec nx build mcp-example  # build a package
+pnpm exec nx run-many -t lint --fix
 ```
-/plugin marketplace add shadowgate15/brigid
-/plugin install brigid@brigid
+
+## Dependencies (single-version policy)
+
+All external dependencies are declared once in the **root** `package.json`. Individual packages do
+**not** hand-maintain their own `dependencies` — the `@nx/dependency-checks` ESLint rule derives
+them from actual imports and writes them into each package's `package.json` when you run
+`nx lint <pkg> --fix`. Add a new dependency at the root, import it, then `lint --fix`.
+
+## Add a new MCP server
+
+```sh
+pnpm exec nx g @nx/js:lib packages/mcp-<name> --name=mcp-<name> --publishable \
+  --importPath=@brigid/mcp-<name> --bundler=tsc --unitTestRunner=none --linter=eslint
 ```
 
-Update later with `/plugin marketplace update brigid`. You can also download the packaged `brigid.plugin` from the [latest release](https://github.com/shadowgate15/brigid/releases).
+Then adapt it to the [`mcp-example`](packages/mcp-example) pattern: set `type: module`, add a `bin`
+and `publishConfig` to `package.json`, switch the package `tsconfig.json` to `nodenext`, and copy
+the `src/index.ts` (`createServer()`) + `src/bin.ts` (stdio runner) split.
 
-## Setup
+## Releasing (independent versions)
 
-No configuration required inside the plugin. To get task-manager features, connect Todoist in your environment's connector settings — the skills will detect it automatically. Without a connector, every skill still works conversationally.
+Releases are driven by [`nx release`](https://nx.dev/features/manage-releases) with
+**conventional commits** and **independent** per-project versions. Each project tags as
+`{projectName}@{version}`.
 
-## Usage
+```sh
+pnpm exec nx release --dry-run --first-release   # preview the first release
+pnpm exec nx release --first-release             # cut it for real
+pnpm exec nx release                             # subsequent releases
+```
 
-Just ask naturally, e.g.:
-
-- "Help me process my inbox"
-- "Let's do my weekly review"
-- "What can I work on right now, I'm at my computer with about 30 minutes"
-- "Plan my day, I have a 2pm meeting"
-- "Is Todoist connected?"
+- **MCP packages** (`mcps` group) bump their `package.json`, generate a changelog, tag, and publish
+  to npm.
+- **The plugin** (`plugin` group) is not an npm package. A custom version action
+  ([`tools/nx/claude-plugin-version-actions.js`](tools/nx/claude-plugin-version-actions.js))
+  propagates its version from `packages/claude-plugin/package.json` into
+  `packages/claude-plugin/.claude-plugin/plugin.json` and the root `.claude-plugin/marketplace.json`
+  in the same release commit. It is `private`, so npm publish is skipped.

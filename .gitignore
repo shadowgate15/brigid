@@ -1,0 +1,20 @@
+# dependencies
+node_modules
+
+# nx
+.nx/cache
+.nx/workspace-data
+
+# build output
+dist
+tmp
+out-tsc
+
+# local npm registry (verdaccio) storage — config is tracked, storage is not
+tmp/local-registry
+
+# misc
+.DS_Store
+*.log
+.env
+.env.local
