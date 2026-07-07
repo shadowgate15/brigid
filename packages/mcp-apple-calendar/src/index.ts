@@ -43,6 +43,10 @@ export function createServer(): McpServer {
     },
     async ({ date, dateRange }) => {
       try {
+        // Fail fast at the tool boundary — reject an ambiguous window before spawning the subprocess.
+        if (Boolean(date) === Boolean(dateRange)) {
+          throw new Error('Provide exactly one of "date" or "dateRange".');
+        }
         return ok({ events: await findEvents({ date, dateRange }) });
       } catch (error) {
         return fail(error);

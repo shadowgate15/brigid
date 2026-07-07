@@ -47,7 +47,9 @@ export async function findEvents(window: EventWindow): Promise<Event[]> {
     execFile(
       'osascript',
       ['-l', 'JavaScript', SCRIPT_PATH, JSON.stringify(window)],
-      { timeout: 35_000 },
+      // maxBuffer raised well above the 1 MB default: a wide dateRange over a dense calendar can
+      // emit more than that, and the default would surface as an opaque "stdout maxBuffer exceeded".
+      { timeout: 35_000, maxBuffer: 16 * 1024 * 1024 },
       (error, out, stderr) => {
         if (error) reject(new Error(`osascript failed: ${stderr || error.message}`));
         else resolve(out);

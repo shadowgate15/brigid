@@ -23,6 +23,11 @@ function parseWindow(input) {
   if (input.dateRange && (!input.dateRange.from || !input.dateRange.to)) {
     throw { reason: 'bad-input', message: 'dateRange requires both "from" and "to".' };
   }
+  // Reject reversed bounds: an inverted predicate window returns [] on EventKit, which would
+  // masquerade as a genuinely empty result and break the "empty means truly empty" guarantee.
+  if (input.dateRange && input.dateRange.from > input.dateRange.to) {
+    throw { reason: 'bad-input', message: 'dateRange "from" must not be after "to".' };
+  }
   return input.date ? { from: input.date, to: input.date } : input.dateRange;
 }
 
