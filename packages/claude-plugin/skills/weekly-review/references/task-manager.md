@@ -31,5 +31,7 @@ This file only records how weekly-review uses them.
 
 ## Calendar
 
-There is no calendar connector in this plugin version. If the user wants a calendar review, ask them
-to summarize their past/upcoming week directly — don't claim to see calendar data that isn't connected.
+Calendar is a separate connector, detected independently of the task manager. When present,
+`references/calendar.md` covers how the previous- and upcoming-calendar review steps use `find-events`.
+When absent or unreadable, ask the user to summarize their past/upcoming week directly — don't claim
+to see calendar data that isn't connected.
