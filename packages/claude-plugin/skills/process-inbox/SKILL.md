@@ -16,11 +16,18 @@ Walk the user through the GTD clarify step: convert raw, unprocessed inputs into
 
 ## Step 1: Detect the active task manager
 
-Check the list of currently available tools for names matching known connector signatures:
+This skill uses two capability groups from the
+[task-manager contract](../../../../docs/contracts/task-manager.md), detected independently by
+tool-name signature under an `mcp__*__` prefix:
 
-- **Todoist**: tool names containing `add-tasks`, `find-tasks`, `add-projects`, `add-labels` under an `mcp__*__` prefix.
+- **core** (required here): `add-tasks`, `find-tasks`. Detect by the presence of `add-tasks`.
+- **projects-labels** (optional): `find-projects`, `add-projects`, `find-labels`, `add-labels`.
+  Detect by the presence of `add-projects`.
 
-If a match is found, read `references/todoist.md` for the exact tool-calling contract before creating or moving anything. If no task-manager connector is detected, read `references/manual-fallback.md` and continue the workflow conversationally — do not block or error.
+If **core** is present, read `references/task-manager.md` before creating anything. Degrade per group:
+when **projects-labels** is absent, still create tasks but skip project filing and label reuse/creation
+(ask the user how to categorize instead). If **core** is not present at all, read
+`references/manual-fallback.md` and continue conversationally — do not block or error.
 
 ## Step 2: Gather the raw items
 

@@ -144,3 +144,46 @@ Move tasks' due dates.
 - **Out:** the rescheduled tasks, at least `{ id, due }`.
 - **Guarantee:** **preserves recurrence patterns and the existing time-of-day.** This is the only
   contract tool permitted to change a due date. Always use it — never `update-tasks` — for date moves.
+
+## projects-labels (optional)
+
+Structural organization: the projects tasks belong to and the context labels they carry. Skills use
+this group to file tasks correctly and to reuse existing structure rather than creating duplicates.
+Detected independently of Core; when absent, a skill still creates tasks (just without project/label
+lookups) or falls back to asking the user.
+
+### `find-projects`
+
+List the active projects.
+
+- **In:** none.
+- **Out:** `projects[]`, each with at least `{ id, name }`.
+- **Guarantee:** returns the currently active projects so a skill can resolve a name to file under.
+
+### `add-projects`
+
+Create one or more projects.
+
+- **In:** `projects: Project[]`, each with `name` (required) and optional `parent` (id or name of a
+  parent project).
+- **Out:** the created projects, each with at least `{ id, name }`.
+- **Guarantee:** batched creation. A skill that creates a project for a multi-step outcome should
+  follow up with `add-tasks` using the returned project id for the first next action.
+
+### `find-labels`
+
+List the existing context labels.
+
+- **In:** none.
+- **Out:** `labels[]`, each with at least `{ name }`.
+- **Guarantee:** returns existing labels so a skill reuses them rather than creating near-duplicates.
+  A leading `@` is display sugar; label names are returned and accepted without it.
+
+### `add-labels`
+
+Create one or more context labels.
+
+- **In:** `names: string[]`.
+- **Out:** the created labels, each with at least `{ name }`.
+- **Guarantee:** batched. Use only after `find-labels` shows the needed label doesn't already exist.
+  A leading `@` is normalized away.

@@ -11,7 +11,7 @@ automatically.
 | Capability group | Status |
 |---|---|
 | **Core** (task create / query / lifecycle) | ✅ implemented |
-| `projects-labels` | ⬜ not yet |
+| `projects-labels` | ✅ implemented |
 | `filters` | ⬜ not yet |
 | `analytics` | ⬜ not yet (skills degrade — e.g. `weekly-review` computes from Core data) |
 

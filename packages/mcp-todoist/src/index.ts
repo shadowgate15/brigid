@@ -168,5 +168,86 @@ export function createServer(): McpServer {
     },
   );
 
+  // --- projects-labels group ---
+
+  server.registerTool(
+    'find-projects',
+    {
+      title: 'Find projects',
+      description: 'List the active projects.',
+      inputSchema: {},
+    },
+    async () => {
+      try {
+        return ok({ projects: await todoist.findProjects() });
+      } catch (error) {
+        return fail(error);
+      }
+    },
+  );
+
+  server.registerTool(
+    'add-projects',
+    {
+      title: 'Add projects',
+      description: 'Create one or more projects.',
+      inputSchema: {
+        projects: z
+          .array(
+            z.object({
+              name: z.string().min(1),
+              parent: z.string().optional().describe('Parent project id or name'),
+            }),
+          )
+          .min(1),
+      },
+    },
+    async ({ projects }) => {
+      try {
+        const created = [];
+        for (const project of projects) created.push(await todoist.createProject(project));
+        return ok({ created });
+      } catch (error) {
+        return fail(error);
+      }
+    },
+  );
+
+  server.registerTool(
+    'find-labels',
+    {
+      title: 'Find labels',
+      description: 'List the existing context labels.',
+      inputSchema: {},
+    },
+    async () => {
+      try {
+        return ok({ labels: await todoist.findLabels() });
+      } catch (error) {
+        return fail(error);
+      }
+    },
+  );
+
+  server.registerTool(
+    'add-labels',
+    {
+      title: 'Add labels',
+      description: "Create one or more context labels. Use only after find-labels shows it's missing.",
+      inputSchema: {
+        names: z.array(z.string().min(1)).min(1),
+      },
+    },
+    async ({ names }) => {
+      try {
+        const created = [];
+        for (const name of names) created.push(await todoist.createLabel(name));
+        return ok({ created });
+      } catch (error) {
+        return fail(error);
+      }
+    },
+  );
+
   return server;
 }

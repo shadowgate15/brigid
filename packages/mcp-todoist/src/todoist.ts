@@ -67,6 +67,25 @@ interface TodoistProject {
   name: string;
 }
 
+interface TodoistLabel {
+  id: string;
+  name: string;
+}
+
+export interface ContractProject {
+  id: string;
+  name: string;
+}
+
+export interface ContractLabel {
+  name: string;
+}
+
+export interface ProjectInput {
+  name: string;
+  parent?: string;
+}
+
 /** A leading "@" is display sugar; Todoist stores label names without it. */
 function bareLabel(label: string): string {
   return label.replace(/^@/, '');
@@ -231,5 +250,29 @@ export class TodoistClient {
     const body = date.includes('T') ? { due_datetime: date } : { due_date: date };
     const task = await this.#request<TodoistTask>('POST', `/tasks/${id}`, { body });
     return toContractTask(task);
+  }
+
+  async findProjects(): Promise<ContractProject[]> {
+    const projects = await this.#request<TodoistProject[]>('GET', '/projects');
+    return projects.map((p) => ({ id: p.id, name: p.name }));
+  }
+
+  async createProject(input: ProjectInput): Promise<ContractProject> {
+    const body: Record<string, unknown> = { name: input.name };
+    if (input.parent !== undefined) body['parent_id'] = await this.#resolveProjectId(input.parent);
+    const project = await this.#request<TodoistProject>('POST', '/projects', { body });
+    return { id: project.id, name: project.name };
+  }
+
+  async findLabels(): Promise<ContractLabel[]> {
+    const labels = await this.#request<TodoistLabel[]>('GET', '/labels');
+    return labels.map((l) => ({ name: l.name }));
+  }
+
+  async createLabel(name: string): Promise<ContractLabel> {
+    const label = await this.#request<TodoistLabel>('POST', '/labels', {
+      body: { name: bareLabel(name) },
+    });
+    return { name: label.name };
   }
 }
