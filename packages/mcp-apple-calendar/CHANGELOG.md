@@ -1,3 +1,13 @@
+## 0.0.3 (2026-07-07)
+
+### 🩹 Fixes
+
+- bump version ([2a5cda1](https://github.com/shadowgate15/brigid/commit/2a5cda1))
+
+### ❤️ Thank You
+
+- Taylor Schley @shadowgate15
+
 ## 0.0.2 (2026-07-07)
 
 ### 🚀 Features
