@@ -15,11 +15,18 @@ Surface a short, realistic list of next actions filtered by the context the user
 
 ## Step 1: Detect the active task manager
 
-Check available tools for known connector signatures:
+This skill draws on three capability groups from the
+[task-manager contract](../../../../docs/contracts/task-manager.md), detected independently by
+tool-name signature under an `mcp__*__` prefix:
 
-- **Todoist**: tool names containing `find-tasks`, `find-filters` under an `mcp__*__` prefix.
+- **core** (required here): `find-tasks`. Detect by its presence.
+- **filters** (optional): `find-filters`. Lets you reuse the user's saved views.
+- **projects-labels** (optional): `find-labels`. Lets you confirm exact context-label names.
 
-If detected, read `references/todoist.md` for the exact query contract. If not detected, read `references/manual-fallback.md` and work from what the user tells you.
+If **core** is present, read `references/task-manager.md` for how to query. Degrade per group: without
+**filters**, build an ad-hoc structured query instead of reusing saved filters; without
+**projects-labels**, use the context labels the user states verbatim rather than confirming them. If
+**core** is absent, read `references/manual-fallback.md` and work from what the user tells you.
 
 ## Step 2: Establish context
 

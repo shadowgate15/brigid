@@ -187,3 +187,35 @@ Create one or more context labels.
 - **Out:** the created labels, each with at least `{ name }`.
 - **Guarantee:** batched. Use only after `find-labels` shows the needed label doesn't already exist.
   A leading `@` is normalized away.
+
+## filters (optional)
+
+Saved queries and completed history — the parts of a task manager beyond the live open-task list.
+Detected independently; when absent, a skill does without saved filters and reconstructs "what got
+done" from whatever it can, or asks the user.
+
+### `find-filters`
+
+List the user's saved filters.
+
+- **In:** none.
+- **Out:** `filters[]`, each with at least `{ name, query }`.
+- **Guarantee:** returns the user's saved filter definitions so a skill can prefer an existing curated
+  view over building an ad-hoc query.
+
+### `find-completed-tasks`
+
+Query recently completed tasks.
+
+- **In:** optional `since` / `until` (`YYYY-MM-DD`), `project` (id or name), `limit`.
+- **Out:** `tasks[]`, each with at least `{ id, content, completedAt }`.
+- **Guarantee:** returns tasks completed in the window, most useful for reflection/review. Distinct
+  from `find-tasks`, which only sees open tasks.
+
+### Raw filter escape hatch
+
+A server advertising the `filters` group **may** also accept an optional `rawFilter` string on
+[`find-tasks`](#find-tasks): a backend-native query passed straight through, bypassing the neutral
+[structured filter](#structured-filter). It is a power-user escape hatch — skills should prefer the
+structured fields and only reach for `rawFilter` when a query genuinely can't be expressed neutrally.
+When present, `rawFilter` takes precedence over the structured fields.

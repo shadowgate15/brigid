@@ -78,6 +78,10 @@ export function createServer(): McpServer {
           .optional()
           .describe('Inclusive YYYY-MM-DD span'),
         sort: z.literal('priority').optional().describe('p1 first'),
+        rawFilter: z
+          .string()
+          .optional()
+          .describe('filters group: backend-native query; overrides the structured fields'),
       },
     },
     async (filter) => {
@@ -243,6 +247,45 @@ export function createServer(): McpServer {
         const created = [];
         for (const name of names) created.push(await todoist.createLabel(name));
         return ok({ created });
+      } catch (error) {
+        return fail(error);
+      }
+    },
+  );
+
+  // --- filters group ---
+
+  server.registerTool(
+    'find-filters',
+    {
+      title: 'Find filters',
+      description: 'List the user’s saved filters.',
+      inputSchema: {},
+    },
+    async () => {
+      try {
+        return ok({ filters: await todoist.findFilters() });
+      } catch (error) {
+        return fail(error);
+      }
+    },
+  );
+
+  server.registerTool(
+    'find-completed-tasks',
+    {
+      title: 'Find completed tasks',
+      description: 'Query recently completed tasks (distinct from find-tasks, which sees only open tasks).',
+      inputSchema: {
+        since: z.string().optional().describe('YYYY-MM-DD lower bound'),
+        until: z.string().optional().describe('YYYY-MM-DD upper bound'),
+        project: z.string().optional().describe('Project id or name'),
+        limit: z.number().int().positive().optional(),
+      },
+    },
+    async (query) => {
+      try {
+        return ok({ tasks: await todoist.findCompletedTasks(query) });
       } catch (error) {
         return fail(error);
       }

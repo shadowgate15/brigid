@@ -7,6 +7,7 @@
  */
 
 const API_BASE = 'https://api.todoist.com/rest/v2';
+const SYNC_BASE = 'https://api.todoist.com/sync/v9';
 
 /** Contract priorities are p1 (highest) .. p4 (default). Todoist's API is 4 (highest) .. 1. */
 const PRIORITY_TO_API: Record<Priority, number> = { p1: 4, p2: 3, p3: 2, p4: 1 };
@@ -21,6 +22,26 @@ export interface StructuredFilter {
   date?: string;
   dateRange?: { from: string; to: string };
   sort?: 'priority';
+  /** filters group: backend-native query passed through, bypassing the structured fields. */
+  rawFilter?: string;
+}
+
+export interface CompletedQuery {
+  since?: string;
+  until?: string;
+  project?: string;
+  limit?: number;
+}
+
+export interface SavedFilter {
+  name: string;
+  query: string;
+}
+
+export interface CompletedTask {
+  id: string;
+  content: string;
+  completedAt: string;
 }
 
 export interface TaskInput {
@@ -105,6 +126,9 @@ const isNumericId = (value: string): boolean => /^\d+$/.test(value);
  * id is given) a separate `project_id` query param — ids can't go in the filter DSL.
  */
 function buildQuery(filter: StructuredFilter): { filter?: string; project_id?: string } {
+  // Raw escape hatch (filters group) wins over the structured fields.
+  if (filter.rawFilter) return { filter: filter.rawFilter };
+
   const parts: string[] = [];
   for (const label of filter.labels ?? []) parts.push(`@${bareLabel(label)}`);
   for (const label of filter.excludeLabels ?? []) parts.push(`!@${bareLabel(label)}`);
@@ -168,9 +192,9 @@ export class TodoistClient {
   async #request<T>(
     method: string,
     path: string,
-    opts: { query?: Record<string, string>; body?: unknown } = {},
+    opts: { query?: Record<string, string>; body?: unknown; base?: string } = {},
   ): Promise<T> {
-    const url = new URL(`${API_BASE}${path}`);
+    const url = new URL(`${opts.base ?? API_BASE}${path}`);
     for (const [key, value] of Object.entries(opts.query ?? {})) url.searchParams.set(key, value);
 
     const response = await fetch(url, {
@@ -274,5 +298,34 @@ export class TodoistClient {
       body: { name: bareLabel(name) },
     });
     return { name: label.name };
+  }
+
+  /** Saved filters live in the Sync API, not REST. */
+  async findFilters(): Promise<SavedFilter[]> {
+    const data = await this.#request<{ filters?: { name: string; query: string }[] }>(
+      'GET',
+      '/sync',
+      { base: SYNC_BASE, query: { sync_token: '*', resource_types: '["filters"]' } },
+    );
+    return (data.filters ?? []).map((f) => ({ name: f.name, query: f.query }));
+  }
+
+  /** Completed tasks come from the Sync API's completed history. */
+  async findCompletedTasks(query: CompletedQuery): Promise<CompletedTask[]> {
+    const params: Record<string, string> = {};
+    if (query.since) params['since'] = `${query.since}T00:00:00`;
+    if (query.until) params['until'] = `${query.until}T23:59:59`;
+    if (query.limit !== undefined) params['limit'] = String(query.limit);
+    if (query.project) params['project_id'] = await this.#resolveProjectId(query.project);
+
+    const data = await this.#request<{
+      items?: { task_id?: string; id?: string; content: string; completed_at: string }[];
+    }>('GET', '/completed/get_all', { base: SYNC_BASE, query: params });
+
+    return (data.items ?? []).map((item) => ({
+      id: item.task_id ?? item.id ?? '',
+      content: item.content,
+      completedAt: item.completed_at,
+    }));
   }
 }

@@ -12,7 +12,7 @@ automatically.
 |---|---|
 | **Core** (task create / query / lifecycle) | ✅ implemented |
 | `projects-labels` | ✅ implemented |
-| `filters` | ⬜ not yet |
+| `filters` | ✅ implemented |
 | `analytics` | ⬜ not yet (skills degrade — e.g. `weekly-review` computes from Core data) |
 
 ## Configuration
