@@ -1,0 +1,38 @@
+{
+  "name": "mcp-apple-calendar",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/mcp-apple-calendar/src",
+  "projectType": "library",
+  "release": {
+    "version": {
+      "manifestRootsToUpdate": ["dist/{projectRoot}"],
+      "currentVersionResolver": "git-tag",
+      "fallbackCurrentVersionResolver": "disk"
+    }
+  },
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/mcp-apple-calendar",
+        "main": "packages/mcp-apple-calendar/src/index.ts",
+        "tsConfig": "packages/mcp-apple-calendar/tsconfig.lib.json",
+        "assets": [
+          "packages/mcp-apple-calendar/*.md",
+          {
+            "input": "packages/mcp-apple-calendar/src/native",
+            "glob": "*.js",
+            "output": "src/native"
+          }
+        ]
+      }
+    },
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
+      }
+    }
+  }
+}

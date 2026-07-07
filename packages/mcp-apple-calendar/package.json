@@ -1,0 +1,20 @@
+{
+  "name": "@brigid/mcp-apple-calendar",
+  "version": "0.0.1",
+  "description": "Read-only Apple Calendar MCP server (via macOS EventKit) — the reference implementation of brigid's calendar capability contract.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "bin": {
+    "mcp-apple-calendar": "./src/bin.js"
+  },
+  "files": ["src", "README.md"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4.3"
+  }
+}

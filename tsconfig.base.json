@@ -6,9 +6,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "lib": [
-      "ES2023"
-    ],
+    "lib": ["ES2023"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "noFallthroughCasesInSwitch": true,
@@ -22,11 +20,10 @@
     "strict": true,
     "target": "ES2022",
     "paths": {
-      "@brigid/mcp-example": [
-        "./packages/mcp-example/src/index.ts"
-      ],
-      "@brigid/mcp-todoist": [
-        "./packages/mcp-todoist/src/index.ts"
+      "@brigid/mcp-example": ["./packages/mcp-example/src/index.ts"],
+      "@brigid/mcp-todoist": ["./packages/mcp-todoist/src/index.ts"],
+      "@brigid/mcp-apple-calendar": [
+        "./packages/mcp-apple-calendar/src/index.ts"
       ]
     }
   }

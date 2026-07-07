@@ -51,3 +51,22 @@ is present in the session.
 **Manual fallback**:
 The conversational mode a skill runs in when no conforming connector is detected — it does
 the work in chat instead of writing to a tool.
+
+**Calendar**:
+The connector category for a user's committed schedule — the tools that read the events they
+have deliberately placed on specific days and times. A second connector category alongside Task
+manager; it has its own capability contract.
+_Avoid_: schedule app, agenda
+
+**Hard landscape**:
+The set of commitments fixed to a specific day or time — what lives on the Calendar. It is
+_immovable scaffolding_ a plan is built around, categorically distinct from the flexible
+next-action lists a skill draws candidates from. A task carrying a due date is **not** part of
+the hard landscape.
+_Avoid_: schedule, commitments (unqualified)
+
+**Event**:
+One entry on the Calendar: a titled commitment with a start and end. It is **day-specific**
+(all-day — must happen that day, no fixed time) or **time-specific** (a start/end time). This
+day-specific vs time-specific split is the load-bearing distinction in the Event shape.
+_Avoid_: appointment, meeting (those are kinds of event, not the category)

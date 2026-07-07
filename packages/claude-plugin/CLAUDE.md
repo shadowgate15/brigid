@@ -44,7 +44,13 @@ The task-manager connector is defined by a written **capability contract** at
 into a required **core** group plus optional groups (`projects-labels`, `filters`, `analytics`) that
 skills detect and degrade **independently**. Skills target the contract; any conforming server works;
 [`@brigid/mcp-todoist`](../mcp-todoist/CLAUDE.md) is the reference implementation. See
-[ADR 0001](../../docs/adr/0001-task-manager-capability-contract.md). Calendar / notes / email are
+[ADR 0001](../../docs/adr/0001-task-manager-capability-contract.md).
+
+The Calendar connector is defined by its own **capability contract** at
+[`docs/contracts/calendar.md`](../../docs/contracts/calendar.md): a single required, **read-only**
+`find-events` group. [`@brigid/mcp-apple-calendar`](../mcp-apple-calendar/CLAUDE.md) (macOS/EventKit)
+is the reference implementation, used today by `plan-day`. See
+[ADR 0002](../../docs/adr/0002-calendar-connector-eventkit-reference.md). Notes / email are still
 anticipated in the design but not implemented.
 
 ## Working with the task-manager connector

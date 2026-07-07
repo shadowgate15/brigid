@@ -13,21 +13,29 @@ metadata:
 
 Build a realistic plan for today by combining fixed commitments with the best available next actions, using the GTD four-fold model for choosing what to do in the moment: context, time available, energy available, priority.
 
-## Step 1: Detect the active task manager
+## Step 1: Detect connectors
 
-This skill needs the task manager's **Core** capability group (see the
-[task-manager contract](../../../../docs/contracts/task-manager.md)). Check the session for the Core
-signature: tool names `find-tasks` and `reschedule-tasks` under an `mcp__*__` prefix.
+This skill detects two connectors **independently** — a missing one never blocks the other.
 
-If Core is present, read `references/task-manager.md` for how this skill uses it. If it is not
-present, read `references/manual-fallback.md` and build the plan from what the user tells you — a
-missing task manager is not an error.
-
-There is no calendar connector in this plugin version — ask the user directly for any fixed commitments today rather than assuming access to a calendar.
+- **Task manager** — needs the **Core** capability group (see the
+  [task-manager contract](../../../../docs/contracts/task-manager.md)). Check the session for the
+  Core signature: tool names `find-tasks` and `reschedule-tasks` under an `mcp__*__` prefix. If
+  present, read `references/task-manager.md` for how this skill uses it; if not, read
+  `references/manual-fallback.md` and build the plan from what the user tells you — a missing task
+  manager is not an error.
+- **Calendar** — needs the **Core** capability group (see the
+  [calendar contract](../../../../docs/contracts/calendar.md)). Check the session for the `find-events`
+  signature under an `mcp__*__` prefix. If present, read `references/calendar.md` for how this
+  skill uses it. If absent, or if `find-events` returns an explicit error (permission not granted,
+  etc.), ask the user directly for today's fixed commitments — a missing or unreadable calendar is
+  never framed as an error, and never assumed to mean the day is clear.
 
 ## Step 2: Establish fixed points
 
-Ask the user for today's fixed commitments (meetings, appointments) if not already known. These are the scaffolding the plan builds around — don't schedule next actions on top of them.
+With Calendar detected, pull today's events per `references/calendar.md` — these are the
+scaffolding the plan builds around. Without Calendar (absent or unreadable), ask the user for
+today's fixed commitments (meetings, appointments) instead. Either way, don't schedule next actions
+on top of a fixed point.
 
 ## Step 3: Pull candidate next actions
 
