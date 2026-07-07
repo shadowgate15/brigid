@@ -17,9 +17,11 @@ Claude Code plugin **marketplace** (`.claude-plugin/marketplace.json`).
 | `claude-plugin` | `packages/claude-plugin` | brigid GTD assistant plugin (skills only; not on npm) | [packages/claude-plugin/CLAUDE.md](packages/claude-plugin/CLAUDE.md) |
 | `mcp-example` | `packages/mcp-example` | Example MCP server + the template for new ones | [packages/mcp-example/CLAUDE.md](packages/mcp-example/CLAUDE.md) |
 | `mcp-todoist` | `packages/mcp-todoist` | Lean Todoist MCP — reference impl of the task-manager [contract](docs/contracts/task-manager.md) | [packages/mcp-todoist/CLAUDE.md](packages/mcp-todoist/CLAUDE.md) |
+| `mcp-apple-calendar` | `packages/mcp-apple-calendar` | Read-only Apple Calendar MCP (macOS/EventKit) — reference impl of the calendar [contract](docs/contracts/calendar.md) | [packages/mcp-apple-calendar/CLAUDE.md](packages/mcp-apple-calendar/CLAUDE.md) |
 
 Human-facing overview: [README.md](README.md). Add new MCP servers under `packages/mcp-<name>`.
-The task-manager capability contract skills target lives in [docs/contracts/task-manager.md](docs/contracts/task-manager.md).
+The task-manager capability contract skills target lives in [docs/contracts/task-manager.md](docs/contracts/task-manager.md);
+the calendar capability contract lives in [docs/contracts/calendar.md](docs/contracts/calendar.md).
 
 ## Everyday commands
 
