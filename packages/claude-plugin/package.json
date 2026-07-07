@@ -1,6 +1,6 @@
 {
   "name": "@brigid/claude-plugin",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "The brigid Claude Code plugin (GTD personal assistant). Not published to npm; this manifest is the version source of truth that nx release propagates into .claude-plugin/plugin.json and the root marketplace.json.",
   "private": true,
   "license": "MIT"

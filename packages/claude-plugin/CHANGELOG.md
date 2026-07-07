@@ -1,3 +1,14 @@
+## 0.1.5 (2026-07-07)
+
+### 🚀 Features
+
+- **claude-plugin:** weekly-review consumes Calendar to review the week's hard landscape ([#9](https://github.com/shadowgate15/brigid/issues/9))
+
+### ❤️ Thank You
+
+- Claude Opus 4.8
+- Taylor Schley @shadowgate15
+
 ## 0.1.4 (2026-07-07)
 
 ### 🚀 Features
