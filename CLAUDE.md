@@ -53,3 +53,17 @@ Prefer `pnpm exec nx ...` over calling tools directly, so Nx caching and task gr
 1. Open that package's `CLAUDE.md` first — the two packages have different authoring models.
 2. Never bump a `version` field by hand (release tooling owns it).
 3. After changing TS source, run `nx lint <pkg> --fix` so derived deps stay correct.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs live in this repo's GitHub Issues (`shadowgate15/brigid`), via the `gh` CLI. External PRs are **not** a triage surface. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Canonical five-role vocabulary with default strings (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `CONTEXT.md` + `docs/adr/` at the repo root (created lazily). See `docs/agents/domain.md`.
