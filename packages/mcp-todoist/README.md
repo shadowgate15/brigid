@@ -8,12 +8,12 @@ automatically.
 
 ## Conformance
 
-| Capability group | Status |
-|---|---|
-| **Core** (task create / query / lifecycle) | ✅ implemented |
-| `projects-labels` | ✅ implemented |
-| `filters` | ✅ implemented |
-| `analytics` | ⬜ not yet (skills degrade — e.g. `weekly-review` computes from Core data) |
+| Capability group                           | Status                                                                     |
+| ------------------------------------------ | -------------------------------------------------------------------------- |
+| **Core** (task create / query / lifecycle) | ✅ implemented                                                             |
+| `projects-labels`                          | ✅ implemented                                                             |
+| `filters`                                  | ✅ implemented                                                             |
+| `analytics`                                | ⬜ not yet (skills degrade — e.g. `weekly-review` computes from Core data) |
 
 ## Configuration
 
@@ -48,3 +48,5 @@ TODOIST_API_TOKEN=... node dist/packages/mcp-todoist/src/bin.js
 ```
 
 Or, once published, via `npx @brigid/mcp-todoist`.
+
+🚀
