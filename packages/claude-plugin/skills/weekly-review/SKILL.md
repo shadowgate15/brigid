@@ -16,11 +16,21 @@ Guide the user through the full GTD Weekly Review checklist. This is a ritual, n
 
 ## Step 1: Detect the active task manager
 
-Check available tools for known connector signatures:
+The weekly review touches every capability group in the
+[task-manager contract](../../../../docs/contracts/task-manager.md). Detect each independently by
+tool-name signature under an `mcp__*__` prefix, and degrade per group:
 
-- **Todoist**: tool names containing `find-tasks`, `find-projects`, `get-overview` under an `mcp__*__` prefix.
+- **core** (required here): `find-tasks`. Detect by its presence.
+- **projects-labels** (optional): `find-projects` — the project-list review step.
+- **filters** (optional): `find-completed-tasks` — reviewing what actually got done.
+- **analytics** (optional): `get-overview`, `get-project-health`, `get-productivity-stats`. Often
+  **absent** (the brigid Todoist server doesn't implement it). When absent, **compute the equivalent
+  from Core data**: derive the orientation snapshot and stalled-project flags from `find-projects` +
+  `find-tasks`, and completion trends from `find-completed-tasks`. Never claim missing analytics —
+  reconstruct or ask.
 
-If detected, read `references/todoist.md` for the exact query contract. If not detected, read `references/manual-fallback.md` and run the review conversationally from what the user tells you.
+If **core** is present, read `references/task-manager.md`. If it is absent, read
+`references/manual-fallback.md` and run the review conversationally.
 
 ## Step 2: Get Clear
 

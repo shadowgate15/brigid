@@ -219,3 +219,39 @@ A server advertising the `filters` group **may** also accept an optional `rawFil
 [structured filter](#structured-filter). It is a power-user escape hatch — skills should prefer the
 structured fields and only reach for `rawFilter` when a query genuinely can't be expressed neutrally.
 When present, `rawFilter` takes precedence over the structured fields.
+
+## analytics (optional)
+
+Pre-computed rollups and health signals over the workspace. This is the least-standard group across
+backends — it is the most likely to be absent, and skills must be able to reconstruct its figures
+from Core data (open/completed tasks) when it is.
+
+> **Not implemented by `@brigid/mcp-todoist` in v1.** The reference server deliberately omits this
+> group; `weekly-review` computes the equivalent figures from Core/`filters` data via its degrade
+> path. The group is specified here so a backend that *does* offer these rollups can advertise them.
+
+### `get-overview`
+
+A snapshot to orient a review.
+
+- **In:** none.
+- **Out:** an implementation-defined summary object (e.g. counts of active projects, open/overdue/
+  completed tasks). Skills treat it as advisory context, not a schema to rely on.
+- **Guarantee:** cheap orientation; never the sole source of truth for a decision.
+
+### `get-project-health`
+
+Flag stalled or at-risk projects.
+
+- **In:** optional `project` (id or name); omitted means all projects.
+- **Out:** per-project health signals (e.g. `{ project, hasNextAction, staleDays }`).
+- **Guarantee:** surfaces projects lacking a next action or with no recent activity.
+
+### `get-productivity-stats`
+
+Completion trends over time.
+
+- **In:** optional window.
+- **Out:** an implementation-defined trend summary (e.g. completed-per-day, streaks).
+- **Guarantee:** advisory only; a skill that needs exact counts derives them from
+  `find-completed-tasks`.
