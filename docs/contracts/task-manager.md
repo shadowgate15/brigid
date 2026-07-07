@@ -1,0 +1,146 @@
+# Task-manager capability contract
+
+The interface between brigid's GTD skills and any task-manager backend. Skills target this
+contract; a **conforming server** implements it; `@brigid/mcp-todoist` is the
+**reference implementation**. See [ADR 0001](../adr/0001-task-manager-capability-contract.md)
+for why the seam is a detect-and-conform contract rather than a bundled or proxy server, and
+[CONTEXT.md](../../CONTEXT.md) for the vocabulary used here.
+
+> This document grows additively. Core is specified in full below; each optional group is
+> specified in its own section as it is implemented.
+
+## Detection convention
+
+A session exposes MCP tools under a per-server prefix: `mcp__<server-id>__<name>`. This contract
+fixes the **suffix** (`<name>`); the prefix is whatever server provides it. A skill detects a
+capability by testing whether a tool with the matching suffix is present in the session — a plain
+string check, nothing more. Servers advertise a capability purely by exposing tools with the
+canonical names.
+
+## Tiered conformance
+
+Capabilities are grouped. A server is **conforming** if it implements **Core**; every other group
+is optional and detected independently.
+
+| Group | Status | Tools |
+|---|---|---|
+| **Core** | required | `add-tasks`, `find-tasks`, `update-tasks`, `complete-tasks`, `uncomplete-tasks`, `reschedule-tasks` |
+| `projects-labels` | optional | `find-projects`, `add-projects`, `find-labels`, `add-labels` |
+| `filters` | optional | `find-filters`, `find-completed-tasks` |
+| `analytics` | optional | `get-overview`, `get-project-health`, `get-productivity-stats` |
+
+A **group is available** to a skill when the tool-name signatures for that group are present in the
+session. Skills detect each group they use and **degrade per group**: a missing optional group means
+that skill does without it (computes an approximation, skips a refinement, or asks the user), not
+that the whole task manager is treated as absent.
+
+## Manual fallback
+
+When **Core** is not detected at all, a skill must fall back to **manual mode** — doing the work
+conversationally rather than writing to a tool. A missing task manager is never framed as an error;
+the skills still function, just without persistence.
+
+## Evolution
+
+The contract is **unversioned**. There is no handshake to negotiate — the tool-name signatures *are*
+the compatibility surface. Therefore:
+
+- **Additive change** → introduce a **new optional group** (or add a tool to an optional group). Core
+  is left untouched, so every existing server keeps conforming.
+- **Incompatible change** to a capability → give it a **new tool name**. Servers that only expose the
+  old name simply won't match the new signature and degrade cleanly.
+
+Never repurpose an existing tool name for incompatible behavior.
+
+## Structured filter
+
+Task queries use a small, backend-neutral filter object rather than a backend-native query string.
+A conforming server maps these onto its own query language (the reference server translates them to
+Todoist's filter syntax).
+
+```
+StructuredFilter {
+  labels?:        string[]   // include tasks carrying ALL of these context labels
+  excludeLabels?: string[]   // exclude tasks carrying ANY of these labels
+  project?:       string     // restrict to this project (id or name)
+  date?:          string     // YYYY-MM-DD — tasks due/scheduled on this day
+  dateRange?:     { from: string, to: string }  // inclusive YYYY-MM-DD span
+  sort?:          "priority" // ordering hint; "priority" = p1 first
+}
+```
+
+`date` and `dateRange` are mutually exclusive. Omitting every field means "no filter" (all open
+tasks). A server that also supports a raw backend-native filter string exposes that through the
+optional `filters` group, not here — this object stays neutral.
+
+## Shared value shapes
+
+- **Task id** — an opaque, backend-assigned string. Skills pass ids back verbatim; they never
+  construct or parse them.
+- **Priority** — the strings `p1`–`p4`, where `p1` is highest and `p4` is the default/lowest.
+  Integers are not part of the contract.
+- **Due** — a value with at least a `date` (`YYYY-MM-DD`), and, when the backend supports it, an
+  indication of whether the task is `recurring` and an optional time-of-day.
+
+## Core
+
+Task create, query, and lifecycle. Required for conformance.
+
+### `add-tasks`
+
+Create one or more tasks in a single call.
+
+- **In:** `tasks: Task[]`, each with `content` (required — the concrete, verb-first next action) and
+  optional `description`, `priority` (`p1`–`p4`), `labels` (string[]), `dueString` (natural-language
+  due, e.g. "next Friday"), `deadlineDate` (`YYYY-MM-DD`, a hard immovable constraint), `project`
+  (id or name).
+- **Out:** the created tasks, each with at least `{ id, content }`.
+- **Guarantee:** creation is batched; a task with no `dueString`/`deadlineDate` is created unscheduled.
+  `dueString` sets a movable due date; `deadlineDate` sets an immovable one — they are distinct.
+
+### `find-tasks`
+
+Query open tasks with a [structured filter](#structured-filter).
+
+- **In:** the `StructuredFilter` fields (all optional).
+- **Out:** `tasks[]`, each with at least `{ id, content, priority, due, labels }`.
+- **Guarantee:** filtering (labels, exclusions, project, date, sort) is applied **server-side** — a
+  skill never has to pull everything and re-filter. `find-tasks` subsumes any "by date" query via
+  `date`/`dateRange`; there is no separate date tool.
+
+### `update-tasks`
+
+Modify existing tasks' non-schedule fields.
+
+- **In:** `id` (required) plus any of `content`, `description`, `priority`, `labels`, `deadlineDate`.
+- **Out:** the updated task, at least `{ id }`.
+- **Guarantee:** `update-tasks` **must not** be used to move a task's due date — that would destroy
+  recurrence. Date moves go through `reschedule-tasks`. A server should reject or ignore a due-date
+  change here.
+
+### `complete-tasks`
+
+Mark tasks done.
+
+- **In:** `ids: string[]`.
+- **Out:** confirmation per id.
+- **Guarantee:** completing a recurring task advances it to its next occurrence rather than deleting
+  the series (backend-defined next-occurrence semantics).
+
+### `uncomplete-tasks`
+
+Reopen tasks completed by mistake.
+
+- **In:** `ids: string[]`.
+- **Out:** confirmation per id.
+- **Guarantee:** the inverse of `complete-tasks` for a non-recurring completion; restores the task to
+  open.
+
+### `reschedule-tasks`
+
+Move tasks' due dates.
+
+- **In:** `ids: string[]`, `date` (`YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SS`).
+- **Out:** the rescheduled tasks, at least `{ id, due }`.
+- **Guarantee:** **preserves recurrence patterns and the existing time-of-day.** This is the only
+  contract tool permitted to change a due date. Always use it — never `update-tasks` — for date moves.

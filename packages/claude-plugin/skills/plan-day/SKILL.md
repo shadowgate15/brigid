@@ -15,11 +15,13 @@ Build a realistic plan for today by combining fixed commitments with the best av
 
 ## Step 1: Detect the active task manager
 
-Check available tools for known connector signatures:
+This skill needs the task manager's **Core** capability group (see the
+[task-manager contract](../../../../docs/contracts/task-manager.md)). Check the session for the Core
+signature: tool names `find-tasks` and `reschedule-tasks` under an `mcp__*__` prefix.
 
-- **Todoist**: tool names containing `find-tasks-by-date`, `reschedule-tasks` under an `mcp__*__` prefix.
-
-If detected, read `references/todoist.md` for the exact contract. If not detected, read `references/manual-fallback.md` and build the plan from what the user tells you.
+If Core is present, read `references/task-manager.md` for how this skill uses it. If it is not
+present, read `references/manual-fallback.md` and build the plan from what the user tells you — a
+missing task manager is not an error.
 
 There is no calendar connector in this plugin version — ask the user directly for any fixed commitments today rather than assuming access to a calendar.
 
