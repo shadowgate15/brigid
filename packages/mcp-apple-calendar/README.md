@@ -12,8 +12,8 @@ shows, so it sees every account you've added there (iCloud, Google, Exchange, �
 
 ## Conformance
 
-| Capability group | Status |
-|---|---|
+| Capability group                    | Status         |
+| ----------------------------------- | -------------- |
 | **Core** (`find-events`, read-only) | ✅ implemented |
 
 Write (event creation/moves) is intentionally out of scope for v1 — see the contract and ADR 0002.
@@ -51,3 +51,5 @@ node dist/packages/mcp-apple-calendar/src/bin.js
 ```
 
 Or, once published, via `npx @brigid/mcp-apple-calendar`.
+
+🚀
