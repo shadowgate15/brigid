@@ -70,6 +70,6 @@ Email | not yet supported
 
 - If **task-manager core** is absent, `process-inbox`, `weekly-review`, `next-actions`, and `plan-day` still work — just conversationally instead of writing to a tool.
 - If a task-manager **optional group** is absent, name the practical effect rather than calling it an error: without `projects-labels`, `process-inbox` skips project filing and label reuse and `next-actions` can't confirm exact label names; without `filters`, `next-actions` can't reuse saved views and `weekly-review` asks what got done instead of pulling completed tasks; without `analytics`, `weekly-review` computes its snapshot and trends from core data.
-- If **Calendar** is absent (or its `find-events` call fails), `plan-day` asks the user for today's fixed commitments instead of reading them — never treated as an error, and never assumed to mean the day is clear.
+- If **Calendar** is absent (or its `find-events` call fails), `plan-day` asks the user for today's fixed commitments instead of reading them, and `weekly-review` asks the user to summarize their past and upcoming week instead of pulling the previous- and upcoming-calendar events — never treated as an error, and never assumed to mean the day or week is clear.
 
 A missing group is never an error — every skill degrades to still deliver its outcome.
