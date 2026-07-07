@@ -1,3 +1,13 @@
+## 0.0.3 (2026-07-07)
+
+### 🩹 Fixes
+
+- release bump ([75e88c8](https://github.com/shadowgate15/brigid/commit/75e88c8))
+
+### ❤️ Thank You
+
+- Taylor Schley @shadowgate15
+
 ## 0.0.2 (2026-07-07)
 
 ### 🚀 Features
