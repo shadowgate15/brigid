@@ -27,7 +27,7 @@ Each skill is a directory under `skills/<name>/`:
   asks …" with concrete example phrasings, because that text is what routes user requests here.
 - `references/` — connector-specific instructions loaded **on demand**, not up front. This is the
   plugin's own progressive-disclosure: `SKILL.md` detects what's connected, then reads only the
-  matching reference file (e.g. `references/todoist.md`) or `references/manual-fallback.md`.
+  matching reference file (`references/task-manager.md`) or `references/manual-fallback.md`.
 
 Existing skills: `process-inbox`, `weekly-review`, `next-actions`, `plan-day`, `gtd-connectors`.
 
@@ -39,15 +39,24 @@ the matching connector reference. If nothing matches, it falls back to a manual,
 mode — a missing connector is **never** an error. Keep this contract: don't add hard tool
 dependencies, and don't make a skill fail when a connector is absent.
 
-Currently supported connector: **Todoist** (task manager). Calendar / notes / email are
+The task-manager connector is defined by a written **capability contract** at
+[`docs/contracts/task-manager.md`](../../docs/contracts/task-manager.md): canonical tool names, tiered
+into a required **core** group plus optional groups (`projects-labels`, `filters`, `analytics`) that
+skills detect and degrade **independently**. Skills target the contract; any conforming server works;
+[`@brigid/mcp-todoist`](../mcp-todoist/CLAUDE.md) is the reference implementation. See
+[ADR 0001](../../docs/adr/0001-task-manager-capability-contract.md). Calendar / notes / email are
 anticipated in the design but not implemented.
 
-## Adding a new connector
+## Working with the task-manager connector
 
-1. Add `references/<connector>.md` to each skill that should use it, mirroring `todoist.md`.
-2. Add its detection signature (the `mcp__*__` tool names) to the relevant skills' Step 1 and to
-   the `gtd-connectors` skill's known-signatures list.
-3. Keep the manual fallback working regardless.
+- A skill's `references/task-manager.md` records only *how that skill uses* the contract — the
+  required capability groups plus skill-specific usage notes. Tool shapes live in the contract, not
+  the reference; don't duplicate them.
+- To use a new capability, add it to the contract (follow its Evolution rules) before relying on it
+  in a skill, and implement it in `mcp-todoist`.
+- Adding a whole new connector *category* (calendar, notes, …): give it its own contract under
+  `docs/contracts/`, add per-skill references + detection signatures, extend `gtd-connectors`, and
+  keep the manual fallback working regardless.
 
 ## Adding a new skill
 

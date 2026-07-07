@@ -24,6 +24,9 @@
     "paths": {
       "@brigid/mcp-example": [
         "./packages/mcp-example/src/index.ts"
+      ],
+      "@brigid/mcp-todoist": [
+        "./packages/mcp-todoist/src/index.ts"
       ]
     }
   }
